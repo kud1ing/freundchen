@@ -1,8 +1,10 @@
 # freundchen
 
-A little buddy.
+A little buddy, written in [Rust](https://www.rust-lang.org), using [guiver](https://github.com/kud1ing/guiver).
 
-<img width="869" alt="Bildschirmfoto 2022-10-11 um 13 48 38" src="https://user-images.githubusercontent.com/391975/195082455-417e3ead-badc-4b59-b0a8-161b77b74fec.png">
+<img width="912" alt="Bildschirmfoto 2022-10-11 um 14 53 50" src="https://user-images.githubusercontent.com/391975/195096506-0ec82534-bd92-4879-8174-2e803776fa64.png">
+
+Since guiver is a fairly new project itself, not everything may work smoothly.
 
 Currently only a mood tracker is provided.
 It's possible to add other helpful functionality, like:
@@ -12,21 +14,22 @@ It's possible to add other helpful functionality, like:
 
 All your data stays with you. Nothing is shared with anyone. This is not a commercial product and will never be.
 
-freundchen is written in [Rust](https://www.rust-lang.org) and uses [guiver](https://github.com/kud1ing/guiver).
-Since guiver is a fairly new project itself, not everything may work smoothly.
 
 ## Backlog
 
-* [ ] publish Crate
+* [ ] comment on the adjusted mood?
+* [ ] add a habit tracker alongside the mood tracker
 * [ ] add views
   * `current_view`
   * `dashboard_view`
-* [ ] Ctrl+C handler should call `ApplicationState::save_and_quit()` somehow
-  * call `ApplicationState::handle_event(Event::RequestClose)` somehow?
-* [ ] `MoodWidget`: use a more beautiful color palette
-* [ ] persist the data encrypted
-* [ ] add a header with the different views
+  * [ ] add a header/toolbar to switch between views
 * [ ] add a way to configure a username the user would like to be addressed with
+* [ ] persist the data encrypted
+* [ ] Ctrl+C handler should call `ApplicationState::save_and_quit()`
+  * [ ] how?
+    * call `ApplicationState::handle_event(Event::RequestClose)` somehow?
+* [ ] publish Crate
+  * this is blocked by a release of guiver, which is blocked by a a release of Piet
 * [ ] add internationalization
 
 

@@ -72,16 +72,23 @@ impl MoodWidget {
             core: WidgetCore::new(widget_id, debug_rendering_stroke),
             day_of_month_index_today,
             fills_per_mood_value_index: [
-                PaintBrush::Color(Color::rgb8(0, 0, 0)),
-                PaintBrush::Color(Color::rgb8(3, 7, 30)),
+                // Darkest.
                 PaintBrush::Color(Color::rgb8(55, 6, 23)),
-                PaintBrush::Color(Color::rgb8(106, 4, 15)),
-                PaintBrush::Color(Color::rgb8(157, 2, 8)),
+                //
+                PaintBrush::Color(Color::rgb8(86, 1, 29)),
+                PaintBrush::Color(Color::rgb8(118, 0, 32)),
+                PaintBrush::Color(Color::rgb8(149, 0, 30)),
+                PaintBrush::Color(Color::rgb8(180, 0, 22)),
+                //
+                // Middle.
                 PaintBrush::Color(Color::rgb8(208, 0, 0)),
-                PaintBrush::Color(Color::rgb8(220, 47, 2)),
-                PaintBrush::Color(Color::rgb8(232, 93, 4)),
-                PaintBrush::Color(Color::rgb8(232, 93, 4)),
-                PaintBrush::Color(Color::rgb8(232, 93, 4)),
+                //
+                PaintBrush::Color(Color::rgb8(216, 66, 0)),
+                PaintBrush::Color(Color::rgb8(221, 101, 0)),
+                PaintBrush::Color(Color::rgb8(224, 131, 0)),
+                PaintBrush::Color(Color::rgb8(225, 159, 0)),
+                //
+                // Brightest.
                 PaintBrush::Color(Color::rgb8(255, 186, 8)),
             ],
             month_labels: MonthLabels::new(month_labels_font.clone(), number_of_days_in_month),
@@ -152,14 +159,24 @@ impl Widget for MoodWidget {
                 // The given value is a `MoodValuesUpdate`.
                 if let Some(mood_values_update) = value.downcast_ref::<MoodValuesUpdate>() {
                     // The day of month index is within range.
-                    if mood_values_update.day_of_month_index < NUMBER_OF_MOOD_VALUES_PER_DAY {
+                    return if mood_values_update.day_of_month_index < 31 {
                         // Set the given mood values to the given day of month.
                         *self
                             .mood_values_per_day_of_month_index
                             .get_mut(mood_values_update.day_of_month_index as usize)
                             .unwrap() = mood_values_update.mood_values.clone();
-                        return Ok(());
+                        Ok(())
                     }
+                    // The day of month index is out of range.
+                    else {
+                        Err(WidgetError::CommandNotHandled(
+                            self.core.widget_id,
+                            format!(
+                                "Day of month index {} is out of range",
+                                mood_values_update.day_of_month_index
+                            ),
+                        ))
+                    };
                 }
             }
             _ => {}

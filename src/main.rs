@@ -6,8 +6,8 @@ use crate::error::ApplicationError;
 use crate::widget::{MoodValuesUpdate, MoodWidget};
 use guiver::widget::WidgetError;
 use guiver::{
-    run, Application, Clipboard, Color, Command, Event, PaintBrush, Piet, Region, Size, Stroke,
-    StrokeStyle, WidgetEvent, WidgetId, WidgetManager,
+    run, Application, Clipboard, Color, Command, Event, Font, PaintBrush, Piet, Region, Size,
+    Stroke, StrokeStyle, WidgetEvent, WidgetId, WidgetManager,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -46,7 +46,7 @@ struct ApplicationState {
 impl ApplicationState {
     pub(crate) fn new() -> Result<Self, WidgetError> {
         // TODO: Use a good path.
-        let path = PathBuf::from("freundchen.dat");
+        let path = PathBuf::from("freundchen.json");
 
         let mut widget_manager = WidgetManager::new();
 
@@ -59,9 +59,12 @@ impl ApplicationState {
         // Create the widget.
         let padding = widget_manager.new_padding();
         let column = widget_manager.new_column();
-        let text = widget_manager.new_text("Hi, how are you today?");
+        let greeting_text = widget_manager.new_text("Hi, how are you today?");
         let widget_mood = widget_manager.next_widget_id();
         let close_button = widget_manager.new_text_button("Close");
+
+        let mut greeting_font = Font::default();
+        greeting_font.font_size = 16.0;
 
         // Add the mood widget.
         widget_manager.add_widget(Box::new(MoodWidget::new(
@@ -73,9 +76,11 @@ impl ApplicationState {
         widget_manager.send_commands(vec![
             Command::SetMainWidget(padding),
             Command::AddChild(padding, None, column),
-            Command::AddChild(column, None, text),
+            Command::AddChild(column, None, greeting_text),
             Command::AddChild(column, None, widget_mood),
             Command::AddChild(column, None, close_button),
+            //
+            Command::SetFont(greeting_text, greeting_font),
         ])?;
 
         Ok(ApplicationState {
