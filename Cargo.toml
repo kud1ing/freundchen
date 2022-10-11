@@ -1,0 +1,12 @@
+[package]
+name = "freundchen"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+chrono = { version = "^0" }
+ctrlc = { version = "^3", features = ["termination"] }
+# A release of guvier is currently blocked by a release of Piet.
+guiver = { git = "https://github.com/kud1ing/guiver.git" }
+serde = { version = "^1", features = ["derive"] }
+serde_json = { version = "^1" }
