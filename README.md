@@ -17,12 +17,12 @@ All your data stays with you. Nothing is shared with anyone. This is not a comme
 
 ## Backlog
 
-* [ ] comment on the adjusted mood?
 * [ ] add a habit tracker alongside the mood tracker
 * [ ] add views
   * `current_view`
   * `dashboard_view`
   * [ ] add a header/toolbar to switch between views
+* [ ] comment on the adjusted mood?
 * [ ] add a way to configure a username the user would like to be addressed with
 * [ ] persist the data encrypted
 * [ ] Ctrl+C handler should call `ApplicationState::save_and_quit()`
