@@ -39,7 +39,7 @@ impl MoodValueLabels {
             // Draw the current mood value.
             piet.save()?;
             piet.clip(Rect::from_origin_size((text_x, text_y), cell_size));
-            piet.draw_text(&text_layout, (text_x, text_y));
+            piet.draw_text(text_layout, (text_x, text_y));
             piet.restore()?;
         }
 

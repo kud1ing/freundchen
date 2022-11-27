@@ -63,13 +63,15 @@ impl ApplicationState {
         let widget_mood = widget_manager.next_widget_id();
         let close_button = widget_manager.new_text_button("Close");
 
-        let mut greeting_font = Font::default();
-        greeting_font.font_size = 16.0;
+        let greeting_font = Font {
+            font_size: 16.0,
+            ..Default::default()
+        };
 
         // Add the mood widget.
         widget_manager.add_widget(Box::new(MoodWidget::new(
             widget_mood,
-            debug_rendering_stroke.clone(),
+            debug_rendering_stroke,
         )));
 
         // Compose the widget.

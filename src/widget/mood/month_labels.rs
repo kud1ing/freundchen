@@ -37,7 +37,7 @@ impl MonthLabels {
             // Draw the current month label.
             piet.save()?;
             piet.clip(Rect::from_origin_size((text_x, y), cell_size));
-            piet.draw_text(&text_layout, (text_x, y));
+            piet.draw_text(text_layout, (text_x, y));
             piet.restore()?;
         }
 
