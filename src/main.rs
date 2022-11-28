@@ -6,8 +6,8 @@ use crate::error::ApplicationError;
 use crate::widget::{MoodValuesUpdate, MoodWidget};
 use guiver::widget::WidgetError;
 use guiver::{
-    run, Application, Clipboard, Color, Command, Event, Font, PaintBrush, Piet, Region, Size,
-    Stroke, StrokeStyle, WidgetEvent, WidgetId, WidgetManager,
+    run, Application, Clipboard, Color, Command, Event, Font, LinearGradient, PaintBrush, Piet,
+    Region, Size, Stroke, StrokeStyle, UnitPoint, WidgetEvent, WidgetId, WidgetManager,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -89,6 +89,22 @@ impl ApplicationState {
             Command::AddChild(row_buttons, None, close_button),
             //
             Command::SetFont(greeting_text, greeting_font),
+            Command::SetFill(
+                clear_button,
+                Some(PaintBrush::Linear(LinearGradient::new(
+                    UnitPoint::TOP,
+                    UnitPoint::BOTTOM,
+                    (Color::rgb8(255, 0, 0), Color::rgb8(150, 0, 0)),
+                ))),
+            ),
+            Command::SetStroke(
+                clear_button,
+                Some(Stroke {
+                    stroke_brush: PaintBrush::Color(Color::rgb8(220, 0, 0)),
+                    stroke_style: StrokeStyle::default(),
+                    stroke_width: 1.0,
+                }),
+            ),
         ])?;
 
         Ok(ApplicationState {
