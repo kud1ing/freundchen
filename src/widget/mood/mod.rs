@@ -21,9 +21,12 @@ const NUMBER_OF_MOOD_VALUES_PER_DAY: MoodValue = 11;
 
 ///
 #[derive(Clone, Debug)]
-pub struct MoodValuesUpdate {
-    pub day_of_month_index: u8,
-    pub mood_values: HashSet<MoodValue>,
+pub enum MoodValuesUpdate {
+    Clear,
+    Update {
+        day_of_month_index: u8,
+        mood_values: HashSet<MoodValue>,
+    },
 }
 
 // =================================================================================================
@@ -159,25 +162,37 @@ impl Widget for MoodWidget {
         if let WidgetCommand::SetValue(value) = widget_command {
             // The given value is a `MoodValuesUpdate`.
             if let Some(mood_values_update) = value.downcast_ref::<MoodValuesUpdate>() {
-                // The day of month index is within range.
-                return if mood_values_update.day_of_month_index < 31 {
-                    // Set the given mood values to the given day of month.
-                    *self
-                        .mood_values_per_day_of_month_index
-                        .get_mut(mood_values_update.day_of_month_index as usize)
-                        .unwrap() = mood_values_update.mood_values.clone();
-                    Ok(())
+                match mood_values_update {
+                    MoodValuesUpdate::Clear => {
+                        // Clear the data.
+                        self.mood_values_per_day_of_month_index.clear();
+                        return Ok(());
+                    }
+                    MoodValuesUpdate::Update {
+                        day_of_month_index,
+                        mood_values,
+                    } => {
+                        // The day of month index is within range.
+                        return if *day_of_month_index < 31 {
+                            // Set the given mood values to the given day of month.
+                            *self
+                                .mood_values_per_day_of_month_index
+                                .get_mut(*day_of_month_index as usize)
+                                .unwrap() = mood_values.clone();
+                            Ok(())
+                        }
+                        // The day of month index is out of range.
+                        else {
+                            Err(WidgetError::CommandNotHandled(
+                                self.core.widget_id,
+                                format!(
+                                    "Day of month index {} is out of range",
+                                    day_of_month_index
+                                ),
+                            ))
+                        };
+                    }
                 }
-                // The day of month index is out of range.
-                else {
-                    Err(WidgetError::CommandNotHandled(
-                        self.core.widget_id,
-                        format!(
-                            "Day of month index {} is out of range",
-                            mood_values_update.day_of_month_index
-                        ),
-                    ))
-                };
             }
         }
 
@@ -223,7 +238,7 @@ impl Widget for MoodWidget {
             // Inform the world about the update.
             widget_events.push(WidgetEvent::ValueChanged(
                 self.core.widget_id,
-                Box::new(MoodValuesUpdate {
+                Box::new(MoodValuesUpdate::Update {
                     day_of_month_index: clicked_day_of_month_index,
                     mood_values: mood_values.clone(),
                 }),

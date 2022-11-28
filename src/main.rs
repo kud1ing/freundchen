@@ -36,6 +36,7 @@ impl ApplicationData {
 /// The application state.
 struct ApplicationState {
     application_data: ApplicationData,
+    clear_button: WidgetId,
     close_button: WidgetId,
     path: PathBuf,
     there_is_unsaved_data: bool,
@@ -61,6 +62,9 @@ impl ApplicationState {
         let column = widget_manager.new_column();
         let greeting_text = widget_manager.new_text("Hi, how are you today?");
         let widget_mood = widget_manager.next_widget_id();
+
+        let row_buttons = widget_manager.new_row();
+        let clear_button = widget_manager.new_text_button("Clear");
         let close_button = widget_manager.new_text_button("Close");
 
         let greeting_font = Font {
@@ -80,13 +84,16 @@ impl ApplicationState {
             Command::AddChild(padding, None, column),
             Command::AddChild(column, None, greeting_text),
             Command::AddChild(column, None, widget_mood),
-            Command::AddChild(column, None, close_button),
+            Command::AddChild(column, None, row_buttons),
+            Command::AddChild(row_buttons, None, clear_button),
+            Command::AddChild(row_buttons, None, close_button),
             //
             Command::SetFont(greeting_text, greeting_font),
         ])?;
 
         Ok(ApplicationState {
             application_data: ApplicationData::new(),
+            clear_button,
             close_button,
             path,
             there_is_unsaved_data: false,
@@ -122,7 +129,7 @@ impl ApplicationState {
             {
                 commands.push(Command::SetValue(
                     self.widget_mood,
-                    Box::new(MoodValuesUpdate {
+                    Box::new(MoodValuesUpdate::Update {
                         day_of_month_index,
                         mood_values,
                     }),
@@ -190,29 +197,52 @@ impl Application for ApplicationState {
                     if widget_id == self.close_button {
                         self.save_and_quit();
                     }
+                    // The clear button was clicked.
+                    else if widget_id == self.clear_button {
+                        // TODO: error handling
+                        self.widget_manager
+                            .send_command(Command::SetValue(
+                                self.widget_mood,
+                                Box::new(MoodValuesUpdate::Clear),
+                            ))
+                            .unwrap();
+
+                        self.application_data.mood_per_day.clear();
+                        self.there_is_unsaved_data = true;
+                    }
                 }
                 WidgetEvent::ValueChanged(widget_id, value) => {
                     // A value of the mood widget has changed.
                     if widget_id == self.widget_mood {
                         // The given value is a `MoodValuesUpdate`.
                         if let Some(mood_values_update) = value.downcast_ref::<MoodValuesUpdate>() {
-                            // No mood values are given.
-                            if mood_values_update.mood_values.is_empty() {
-                                // Remove the entry.
-                                self.application_data
-                                    .mood_per_day
-                                    .remove(&mood_values_update.day_of_month_index);
-                            }
-                            // Mood values are given.
-                            else {
-                                // Update the mood values in the application data.
-                                self.application_data.mood_per_day.insert(
-                                    mood_values_update.day_of_month_index,
-                                    mood_values_update.mood_values.clone(),
-                                );
-                            }
+                            match mood_values_update {
+                                MoodValuesUpdate::Clear => {
+                                    self.application_data.mood_per_day.clear();
+                                    self.there_is_unsaved_data = true;
+                                }
+                                MoodValuesUpdate::Update {
+                                    day_of_month_index,
+                                    mood_values,
+                                } => {
+                                    // No mood values are given.
+                                    if mood_values.is_empty() {
+                                        // Remove the entry.
+                                        self.application_data
+                                            .mood_per_day
+                                            .remove(day_of_month_index);
+                                    }
+                                    // Mood values are given.
+                                    else {
+                                        // Update the mood values in the application data.
+                                        self.application_data
+                                            .mood_per_day
+                                            .insert(*day_of_month_index, mood_values.clone());
+                                    }
 
-                            self.there_is_unsaved_data = true;
+                                    self.there_is_unsaved_data = true;
+                                }
+                            }
                         } else {
                             unimplemented!()
                         }

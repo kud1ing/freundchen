@@ -17,6 +17,8 @@ All your data stays with you. Nothing is shared with anyone. This is not a comme
 
 ## Backlog
 
+* [ ] publish Crate
+  * this is blocked by a release of guiver, which is blocked by a release of Druid
 * [ ] add a habit tracker alongside the mood tracker
 * [ ] add views
   * `current_view`
@@ -28,8 +30,6 @@ All your data stays with you. Nothing is shared with anyone. This is not a comme
 * [ ] Ctrl+C handler should call `ApplicationState::save_and_quit()`
   * [ ] how?
     * call `ApplicationState::handle_event(Event::RequestClose)` somehow?
-* [ ] publish Crate
-  * this is blocked by a release of guiver, which is blocked by a a release of Piet
 * [ ] add internationalization
 
 
