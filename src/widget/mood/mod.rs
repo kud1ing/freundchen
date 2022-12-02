@@ -66,11 +66,11 @@ impl MoodWidget {
 
         let month_labels_spacing = 20.0;
 
-        let mut mood_value_per_day_of_month_index = vec![];
+        let mut mood_values_per_day_of_month_index = vec![];
 
         // Create the mood values per day.
         for _ in 0..number_of_days_in_month {
-            mood_value_per_day_of_month_index.push(HashSet::new());
+            mood_values_per_day_of_month_index.push(HashSet::new());
         }
 
         MoodWidget {
@@ -104,7 +104,7 @@ impl MoodWidget {
                 mood_value_labels_font,
                 NUMBER_OF_MOOD_VALUES_PER_DAY as u8,
             ),
-            mood_values_per_day_of_month_index: mood_value_per_day_of_month_index,
+            mood_values_per_day_of_month_index,
             number_of_days_in_month,
             mood_cells_grid_stroke: Stroke {
                 stroke_brush: PaintBrush::Color(grid_color),
@@ -164,8 +164,10 @@ impl Widget for MoodWidget {
             if let Some(mood_values_update) = value.downcast_ref::<MoodValuesUpdate>() {
                 match mood_values_update {
                     MoodValuesUpdate::Clear => {
-                        // Clear the data.
-                        self.mood_values_per_day_of_month_index.clear();
+                        // Clear the mood values.
+                        for mood_values in self.mood_values_per_day_of_month_index.iter_mut() {
+                            mood_values.clear();
+                        }
                         return Ok(());
                     }
                     MoodValuesUpdate::Update {
