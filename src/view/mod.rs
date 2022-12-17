@@ -17,13 +17,13 @@ pub(crate) trait View {
     fn activate(
         &mut self,
         application_command: ApplicationCommand,
-        widget_manager: &mut WidgetManager,
+        widget_manager: &mut WidgetManager<()>,
     ) -> Result<(), ApplicationError>;
 
     ///
     fn handle_event(
         &mut self,
-        widget_manager: &mut WidgetManager,
+        widget_manager: &mut WidgetManager<()>,
         widget_events: &[WidgetEvent],
     ) -> Option<ApplicationCommand>;
 

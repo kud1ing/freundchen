@@ -5,11 +5,12 @@ use crate::widget::mood::month_labels::MonthLabels;
 use crate::widget::mood::mood_value_labels::MoodValueLabels;
 use crate::{Piet, Region, Size};
 use chrono::{Datelike, Local};
-use guiver::widget::{WidgetCommand, WidgetError};
+use guiver::widget::WidgetError;
 use guiver::{
     Color, Error, Event, Font, Line, PaintBrush, Point, Rect, RenderContext, SizeConstraints,
     Stroke, Widget, WidgetCore, WidgetEvent, WidgetId,
 };
+use std::any::Any;
 use std::collections::HashSet;
 use std::usize;
 
@@ -158,47 +159,39 @@ impl Widget for MoodWidget {
         self.core.rectangle.size()
     }
 
-    fn handle_command(&mut self, widget_command: &WidgetCommand) -> Result<(), WidgetError> {
-        if let WidgetCommand::SetValue(value) = widget_command {
-            // The given value is a `MoodValuesUpdate`.
-            if let Some(mood_values_update) = value.downcast_ref::<MoodValuesUpdate>() {
-                match mood_values_update {
-                    MoodValuesUpdate::Clear => {
-                        // Clear the mood values.
-                        for mood_values in self.mood_values_per_day_of_month_index.iter_mut() {
-                            mood_values.clear();
-                        }
-                        return Ok(());
+    fn set_value(&mut self, value: Box<dyn Any>) -> Result<(), WidgetError> {
+        // The given value is a `MoodValuesUpdate`.
+        if let Some(mood_values_update) = value.downcast_ref::<MoodValuesUpdate>() {
+            match mood_values_update {
+                MoodValuesUpdate::Clear => {
+                    // Clear the mood values.
+                    for mood_values in self.mood_values_per_day_of_month_index.iter_mut() {
+                        mood_values.clear();
                     }
-                    MoodValuesUpdate::Update {
-                        day_of_month_index,
-                        mood_values,
-                    } => {
-                        // The day of month index is within range.
-                        return if *day_of_month_index < 31 {
-                            // Set the given mood values to the given day of month.
-                            *self
-                                .mood_values_per_day_of_month_index
-                                .get_mut(*day_of_month_index as usize)
-                                .unwrap() = mood_values.clone();
-                            Ok(())
-                        }
-                        // The day of month index is out of range.
-                        else {
-                            Err(WidgetError::CommandNotHandled(
-                                self.core.widget_id,
-                                format!(
-                                    "Day of month index {} is out of range",
-                                    day_of_month_index
-                                ),
-                            ))
-                        };
+                    return Ok(());
+                }
+                MoodValuesUpdate::Update {
+                    day_of_month_index,
+                    mood_values,
+                } => {
+                    // The day of month index is within range.
+                    return if *day_of_month_index < 31 {
+                        // Set the given mood values to the given day of month.
+                        *self
+                            .mood_values_per_day_of_month_index
+                            .get_mut(*day_of_month_index as usize)
+                            .unwrap() = mood_values.clone();
+                        Ok(())
                     }
+                    // The day of month index is out of range.
+                    else {
+                        Err(WidgetError::NotHandled)
+                    };
                 }
             }
         }
 
-        self.core.handle_command(widget_command)
+        Ok(())
     }
 
     fn handle_event(&mut self, event: &Event, widget_events: &mut Vec<WidgetEvent>) {
@@ -354,5 +347,17 @@ impl Widget for MoodWidget {
 
     fn widget_id(&self) -> &WidgetId {
         &self.core.widget_id
+    }
+
+    fn set_debug_rendering(&mut self, debug_rendering: bool) {
+        todo!()
+    }
+
+    fn set_is_disabled(&mut self, is_disabled: bool) {
+        todo!()
+    }
+
+    fn set_is_hidden(&mut self, is_hidden: bool) {
+        todo!()
     }
 }

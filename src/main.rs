@@ -40,7 +40,7 @@ struct ApplicationState {
     close_button: WidgetId,
     path: PathBuf,
     there_is_unsaved_data: bool,
-    widget_manager: WidgetManager,
+    widget_manager: WidgetManager<()>,
     widget_mood: WidgetId,
 }
 
@@ -81,12 +81,36 @@ impl ApplicationState {
         // Compose the widget.
         widget_manager.send_commands(vec![
             Command::SetMainWidget(padding),
-            Command::AddChild(padding, None, column),
-            Command::AddChild(column, None, greeting_text),
-            Command::AddChild(column, None, widget_mood),
-            Command::AddChild(column, None, row_buttons),
-            Command::AddChild(row_buttons, None, clear_button),
-            Command::AddChild(row_buttons, None, close_button),
+            Command::AddChild {
+                parent_widget_id: padding,
+                widget_placement: None,
+                child_widget_id: column,
+            },
+            Command::AddChild {
+                parent_widget_id: column,
+                widget_placement: None,
+                child_widget_id: greeting_text,
+            },
+            Command::AddChild {
+                parent_widget_id: column,
+                widget_placement: None,
+                child_widget_id: widget_mood,
+            },
+            Command::AddChild {
+                parent_widget_id: column,
+                widget_placement: None,
+                child_widget_id: row_buttons,
+            },
+            Command::AddChild {
+                parent_widget_id: row_buttons,
+                widget_placement: None,
+                child_widget_id: clear_button,
+            },
+            Command::AddChild {
+                parent_widget_id: row_buttons,
+                widget_placement: None,
+                child_widget_id: close_button,
+            },
             //
             Command::SetFont(greeting_text, greeting_font),
             Command::SetFill(
